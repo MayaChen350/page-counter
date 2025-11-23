@@ -1,0 +1,4 @@
+apparently the line height is:
+    line-height = line_spacing * (ascent + descent + line_gap)
+        where line_gap is in the .ttf file
+        8 bytes after hhea
