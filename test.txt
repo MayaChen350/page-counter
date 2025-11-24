@@ -1,0 +1,57 @@
+but yeah i feel like i should probably just let this take me
+yeah exactly
+crazily enough ive only been programming and interested in computer science since 3 years 😭
+i mean i kinda was before
+but too scared to think i could do good in it
+truth is i had have a horrible experience with unity development back when i was like 14
+im someone who likes to understand everything and the programming part was the most interesting me but the teacher at my private group class wouldnt really help me
+i think they might have even assumed we knew how to code already
+i mean i dont know how game devs approach scripting
+ive almost always wanted to be certain of what i was writing to feel perfectly confident
+i dont understand whats the point of using ai
+my keyboard just went weird ish
+λx.Maya
+
+ — 15:58
+i mean first it unavoidably causes doom in way too many ways
+invitation to laziness
+invitation to less thinking logically
+invitation to get used to not do anything by yourself
+invitation to want to solve problems fast whatever the cost
+etc
+
+"a calculator does that too"
+
+yeah duhhh it does
+and i literally have a hard time with maths because I let my brain just rely on a calculator
+
+even worse!! I literally have a lot of maths problems because of how lazy and fast I want to go with maths
+i dont think a mathematician would rely on a calculator 100% of the time
+so why would someone who their job is to write algorithm would give up on that capacity to think logically to write algorithms and solve problems efficiently?
+like this is absolutely counter productive and wrong
+on a long term this is absolutely causing doom
+also if that allows "programmers" that don't even know how to code
+well, that don't even feel like coding
+im sorry but if your job bores you, don't use AI to cope with that, just find another one you can love and be useful at
+i dont know how to draw. I could just make ai art, but why would I? it's not my job at all
+λx.Maya
+
+ — 16:06
+if i really wanted to make art, i'd take the time to learn to, but if I just feel lazy and unpassionated about art? then generating it would be absolutely worthless
+i say that but i do consider myself an artist because of poetry
+i even made a post about it
+Well I wrote a comment that I shared on bluesky
+Image
+art is really human actually so having it generated procedurally just is all against the concept of art
+you dont make art for a purpose usually, you make it to express yourself
+coding however well
+i did see it as art before but i guess it's kind of a different thing but still really human
+i've always seen it (for those who dont just copy paste of rewrite things they learned) as like putting a person's logical thinking in a visual way
+which makes it amazing for me
+logical thinking in itself is very abstract
+people do think differently but it shows with programming
+in a way i guess it is art but not really emotion and feeling more like logical sense
+still obviously i feel there's something amazing at being able to structure things well
+depending of how you make your code, fixing bugs or adding features can be either a nightmare or super easy
+...that's one of the reason languages like Java appeared which encouraged the concept of Object Oriented Programming (OOP)
+seperating logic and all, even tho i do feel like it went WAYYY too far

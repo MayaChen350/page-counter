@@ -4,7 +4,6 @@
 
 #ifndef PAGE_COUNTER_UTILS_H
 #define PAGE_COUNTER_UTILS_H
-#include <stdio.h>
 #include <stdlib.h>
 
 void throw_err(void *_, const char *msg);

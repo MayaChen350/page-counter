@@ -3,32 +3,38 @@
 //
 
 #include <stdio.h>
+#include <math.h>
 #include "include/ttf.h"
 #include "page_counter.h"
-
-#include <math.h>
-#include <setjmp.h>
-
 #include "utils.h"
 
 signed short getLineGap(const char *ttf_filename);
 
-int getMaxLinesPerPage(size_pt page_height, size_pt line_height);
+static int getMaxLinesPerPage(size_pt page_height, size_pt line_height);
 
-inline size_pt getSizeByCharSize(const size_pt font_size, const size_em width) {
+static inline size_pt getSizeByCharSize(const size_pt font_size, const size_em width) {
     return ((float) width / 1000) * font_size;
 }
 
-inline size_em getLineHeight(const int font_ascent,
-                             const int font_descent,
-                             const int line_gap,
-                             const float line_spacing) {
+static inline size_em getLineHeight(const int font_ascent,
+                                    const int font_descent,
+                                    const int line_gap,
+                                    const float line_spacing) {
     return line_spacing * (float) (font_ascent + font_descent + line_gap);
 }
 
-int getPageCount(const char *ttf_filename, float page_height, float page_width, const size_pt font_size,
-                 const float user_line_spacing, const char *filename) {
-
+int getPageCount(
+    const char *ttf_filename,
+    size_in page_height,
+    size_in page_width,
+    size_in margin_top,
+    size_in margin_bottom,
+    size_in margin_left,
+    size_in margin_right,
+    const size_pt font_size,
+    const float user_line_spacing,
+    const char *filename
+) {
     const int line_gap = getLineGap(ttf_filename);
 
     ttf_t *font_file = ttfCreate(ttf_filename, 0, throw_err, NULL);
@@ -113,6 +119,8 @@ signed short getLineGap(const char *ttf_filename) {
                 state++;
             else
                 state = 0;
+        else {
+        }
     }
 
     fread(&state, HHEA_LINE_GAP_BYTES_OFFSET, 1, fp); // why not reusing state to discard data
