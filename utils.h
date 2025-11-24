@@ -4,7 +4,8 @@
 
 #ifndef PAGE_COUNTER_UTILS_H
 #define PAGE_COUNTER_UTILS_H
-#include <stdlib.h>
+
+#include "include/ttf.h"
 
 void throw_err(void *_, const char *msg);
 
@@ -15,5 +16,9 @@ void throw_err(void *_, const char *msg);
 typedef float size_pt;
 typedef float size_em;
 typedef float size_in;
+
+size_pt inchToPt(size_in size);
+
+size_in milToInch(size_mil size);
 
 #endif //PAGE_COUNTER_UTILS_H

@@ -22,6 +22,8 @@ extern "C" {
 // Types...
 //
 
+typedef int size_mil; // Size in 1000ths (of an inch)
+
 typedef struct _ttf_s ttf_t;	// Font object
 
 typedef void (*ttf_err_cb_t)(void *data, const char *message);
@@ -81,12 +83,12 @@ typedef struct ttf_rect_s	// Bounding rectangle
 
 extern ttf_t		*ttfCreate(const char *filename, size_t idx, ttf_err_cb_t err_cb, void *err_data);
 extern void		ttfDelete(ttf_t *font);
-extern int		ttfGetAscent(ttf_t *font);
+extern size_mil		ttfGetAscent(ttf_t *font);
 extern ttf_rect_t	*ttfGetBounds(ttf_t *font, ttf_rect_t *bounds);
 extern const int	*ttfGetCMap(ttf_t *font, size_t *num_cmap);
 extern int		ttfGetCapHeight(ttf_t *font);
 extern const char	*ttfGetCopyright(ttf_t *font);
-extern int		ttfGetDescent(ttf_t *font);
+extern size_mil		ttfGetDescent(ttf_t *font);
 extern ttf_rect_t	*ttfGetExtents(ttf_t *font, float size, const char *s, ttf_rect_t *extents);
 extern const char	*ttfGetFamily(ttf_t *font);
 extern float		ttfGetItalicAngle(ttf_t *font);
@@ -97,7 +99,7 @@ extern const char	*ttfGetPostScriptName(ttf_t *font);
 extern ttf_stretch_t	ttfGetStretch(ttf_t *font);
 extern ttf_style_t	ttfGetStyle(ttf_t *font);
 extern const char	*ttfGetVersion(ttf_t *font);
-extern int		ttfGetWidth(ttf_t *font, int ch);
+extern size_mil		ttfGetWidth(ttf_t *font, int ch);
 extern ttf_weight_t	ttfGetWeight(ttf_t *font);
 extern int		ttfGetXHeight(ttf_t *font);
 extern bool		ttfIsFixedPitch(ttf_t *font);

@@ -14,9 +14,9 @@ set(CMAKE_EXE_LINKER_FLAGS_RELEASE "-Wl,--gc-sections")
 
 
 add_library(pagecounter_lib STATIC
-        page_counter.c
-        include/ttf.c
         utils.c
+        include/ttf.c
+        page_counter.c
 )
 
 add_executable(pagecounter main.c)
