@@ -1,0 +1,62 @@
+#!/bin/sh
+
+# Sh scripting (banger)
+
+# (Maya) I use this script on my linux distro to make a zip containing the files required to build a library
+#        Faster for github releases
+#
+#        I added two other options because I felt like it
+
+EXE_NAME="pagecounter"
+LIB_NAME="$EXE_NAME""_lib"
+LIB_FILE_NAME="lib$LIB_NAME.a"
+
+BUILD_FOLDER="dist"
+mkdir -p "$BUILD_FOLDER"
+
+case "$1" in
+  lib)
+    mkdir -p "$BUILD_FOLDER/$1"
+    LIB_ZIP_NAME="$1-$EXE_NAME.zip"
+    SRC_FILES="utils.c utils.h include/ttf.c page_counter.c include/ttf.h page_counter.h"
+
+    # Generate CMakeLists (literally embedded in the sh script lmfao)
+    cat <<EOF > "$BUILD_FOLDER/$1/CMakeLists.txt"
+cmake_minimum_required(VERSION 4.0)
+project(pagecounter C)
+
+set(CMAKE_C_STANDARD 99)
+
+set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type")
+set(CMAKE_C_FLAGS_RELEASE "-O3 -DNDEBUG -ffunction-sections -fdata-sections")
+
+add_library(pagecounter STATIC
+        utils.c
+        include/ttf.c
+        page_counter.c
+)
+EOF
+
+    zip "$BUILD_FOLDER/$1/$LIB_ZIP_NAME" $SRC_FILES > /dev/null
+    zip -u -j "$BUILD_FOLDER/$1/$LIB_ZIP_NAME" "$BUILD_FOLDER/$1/CMakeLists.txt" > /dev/null
+    rm "$BUILD_FOLDER/$1/CMakeLists.txt"
+    echo "Created $LIB_ZIP_NAME in $BUILD_FOLDER/$1/"
+    ;;
+  debug|release)
+    cmake --build "cmake-build-$1" --target $EXE_NAME > /dev/null
+    mkdir -p "$BUILD_FOLDER/$1"
+    mv "cmake-build-$1/$EXE_NAME" "$BUILD_FOLDER/$1"
+    mv "cmake-build-$1/$LIB_FILE_NAME" "$BUILD_FOLDER/$1/lib$EXE_NAME.a"
+
+    if [ "$1" = "debug" ]; then
+      mv "$BUILD_FOLDER/$1/$EXE_NAME" "$BUILD_FOLDER/$1/$EXE_NAME-debug"
+      echo "Created $EXE_NAME-debug in $BUILD_FOLDER/$1/"
+    else
+      echo "Created $EXE_NAME in $BUILD_FOLDER/$1/"
+    fi
+    ;;
+  *)
+    echo "Usage: $0 [release|debug|lib]"
+    exit 1
+    ;;
+esac

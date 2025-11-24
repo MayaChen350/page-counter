@@ -21,4 +21,8 @@ size_pt inchToPt(size_in size);
 
 size_in milToInch(size_mil size);
 
+// Strings
+
+bool strEqual(const char *s1, const char *s2);
+
 #endif //PAGE_COUNTER_UTILS_H
