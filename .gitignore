@@ -172,3 +172,5 @@ fabric.properties
 
 *.ttf
 dist/
+CMakeCache.txt
+/build*/

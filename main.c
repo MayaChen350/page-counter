@@ -22,6 +22,8 @@ int main(void) {
         1,
         1,
         11,
+        0.15f,
+        0.0f,
         1.15f,
         "test.txt"
     );

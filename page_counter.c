@@ -35,6 +35,8 @@ int getPageCount(
     const size_in margin_left,
     const size_in margin_right,
     const size_pt font_size,
+    const size_in paragraph_spacing_before,
+    const size_in paragraph_spacing_after,
     const float user_line_spacing,
     const char *filename
 ) {
@@ -44,6 +46,8 @@ int getPageCount(
 
     page_height = inchToPt(page_height - (margin_top + margin_bottom));
     page_width = inchToPt(page_width - (margin_left + margin_right));
+
+    const size_pt paragraph_spacing = inchToPt(paragraph_spacing_before + paragraph_spacing_after);
 #ifndef NDEBUG
     printf("Page height: %f\n", page_height);
     printf("Page width: %f\n", page_width);
@@ -55,12 +59,10 @@ int getPageCount(
             line_gap,
             user_line_spacing), font_size);
 
-    const int max_lines_per_page = getMaxLinesPerPage(page_height, line_height);
-
     FILE *const file = fopen(filename, "r");
 
     int pageCount = 0;
-    int page_curr_lines = 0;
+    size_pt curr_page_height = 0;
     size_pt line_curr_width = 0;
     size_pt curr_word_width = 0;
     char last_char;
@@ -68,6 +70,7 @@ int getPageCount(
         bool was_newline = false;
         if (last_char == '\n') {
             curr_word_width = 0;
+            line_curr_width = 0;
             was_newline = true;
             goto Increase_line;
         }
@@ -81,17 +84,22 @@ int getPageCount(
         // wrap line if needed
         line_curr_width += char_width;
         if (line_curr_width >= page_width /*UNSURE*/) {
-        Increase_line:
-            page_curr_lines++;
             line_curr_width = curr_word_width;
-            if (page_curr_lines > max_lines_per_page) {
+        Increase_line:
+            if (was_newline)
+                curr_page_height += paragraph_spacing;
+            else
+                curr_page_height += line_height;
+
+            if (curr_page_height > page_height) {
                 pageCount++;
-                page_curr_lines = 0;
+                curr_page_height = 0;
             }
+
             if (was_newline) {
                 was_newline = false;
                 goto Increase_line;
-            } // increase line TWICE if it was \n
+            }
         }
     }
 
