@@ -22,6 +22,9 @@ int getPageCount(
     size_in paragraph_spacing_before,
     size_in paragraph_spacing_after,
 
+    size_in header_from_top,
+    size_in footer_from_bottom,
+
     float user_line_spacing,
     const char *filename
 );

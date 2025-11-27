@@ -174,3 +174,4 @@ fabric.properties
 dist/
 CMakeCache.txt
 /build*/
+test.txt
