@@ -9,18 +9,22 @@
 
 #include <stdlib.h>
 
+#include "ttf_reader.h"
 #include "utils.h"
 
 signed short getHHEALineGap(const char *ttf_filename);
 
-static size_pt getSizeByCharSize(const size_mil width, const size_pt font_size) {
-    return milToInch(width) * font_size;
+static size_pt getSizeByCharSize(const float width, const size_pt font_size, const unsigned short unit_per_em) {
+    printf("%f", width);
+    return width * font_size;
 }
 
-static size_mil getLineHeight(const size_mil font_ascent,
-                              const size_mil font_descent,
-                              const size_em line_gap) {
-    return (font_ascent + abs(font_descent) /*+ line_gap*/);
+static size_pt getLineHeight(const FWORD font_ascent,
+                             const FWORD font_descent,
+                             const FWORD line_gap,
+                             const unsigned short unit_per_em,
+                             const size_pt font_size) {
+    return font_size * ((float) (font_ascent + abs(font_descent) + line_gap) / unit_per_em);
 }
 
 inline static size_pt getHeightExtra(const size_pt extra_height,
@@ -66,15 +70,15 @@ int getPageCount(
     const size_pt max_page_content_width = inchToPt(page_width - (margin_left + margin_right));
     const size_pt paragraph_spacing = inchToPt(paragraph_spacing_before + paragraph_spacing_after);
 
-    // TODO: There is a relation between the line spacing and the font size for the paragraph spacings
+    struct font_t font;
+    font_t_init(&font, ttf_filename);
 
-    ttf_t *const font_file = ttfCreate(ttf_filename, 0, throw_err, NULL);
-
-    const size_pt line_height = getSizeByCharSize(
-        getLineHeight(
-            ttfGetAscent(font_file),
-            ttfGetDescent(font_file),
-            getHHEALineGap(ttf_filename)), font_size);
+    const size_pt line_height = getLineHeight(
+        font.ascender,
+        font.descender,
+        font.line_gap,
+        font.unitsPerEm,
+        font_size);
 
     const size_pt line_gap = user_line_spacing * line_height;
 
@@ -95,6 +99,7 @@ int getPageCount(
 #endif
 
     FILE *const file = fopen(filename, "r");
+    ttf_t *const font_file = ttfCreate(ttf_filename, 0, throw_err, NULL);
 
     int pageCount = 0;
     size_pt curr_page_height = line_height; // start with line 1
@@ -116,11 +121,11 @@ int getPageCount(
             goto Increase_line;
         }
 
-        const size_pt char_width = getSizeByCharSize(ttfGetWidth(font_file, last_char), font_size);
-        // #ifndef NDEBUG
-        //         if (last_char == ' ')
-        //             printf("Char width of %c: %f\n", last_char, char_width);
-        // #endif
+        const size_pt char_width = getSizeByCharSize(ttfGetWidth(font_file, last_char), font_size, font.unitsPerEm);
+        #ifndef NDEBUG
+                if (last_char == ' ')
+                    printf("Char width of %c: %f\n", last_char, char_width);
+        #endif
         if (last_char == ' ' || last_char == '\r' || last_char == '\t')
             curr_word_width = 0;
         else
@@ -156,52 +161,4 @@ int getPageCount(
     ttfDelete(font_file);
 
     return pageCount;
-}
-
-#define HHEA_LINE_GAP_BYTES_OFFSET 8
-#define FWORD_SIZE_BYTES (16 / 8)
-
-signed short getHHEALineGap(const char *ttf_filename) {
-    FILE *fp = fopen(ttf_filename, "r");
-    signed short result;
-
-    int state = 0; // MUST stop before 4
-    while (state < 4) {
-        const char last_char = (char) fgetc(fp);
-
-        if (last_char == EOF) {
-            THROW("The file structure was incorrect");
-        }
-
-        if (state == 0 && last_char == 'h')
-            state++;
-        else if (state == 1)
-            if (last_char == 'h')
-                state++;
-            else
-                state = 0;
-        else if (state == 2)
-            if (last_char == 'e')
-                state++;
-            else
-                state = 0;
-        else if (state == 3)
-            if (last_char == 'a')
-                state++;
-            else
-                state = 0;
-        else {
-        }
-    }
-
-    fread(&state, HHEA_LINE_GAP_BYTES_OFFSET, 1, fp); // why not reusing state to discard data
-
-    // now we have the actual line gap data
-    fread(&result, FWORD_SIZE_BYTES, 1, fp);
-
-    fclose(fp);
-#ifndef NDEBUG
-    printf("Line gap: %i\n", result);
-#endif
-    return result;
 }

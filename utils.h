@@ -5,7 +5,11 @@
 #ifndef PAGE_COUNTER_UTILS_H
 #define PAGE_COUNTER_UTILS_H
 
+#include <stdio.h>
+
 #include "include/ttf.h"
+
+void advance_file_until(FILE *fp, const char *until);
 
 void throw_err(void *_, const char *msg);
 
