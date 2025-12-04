@@ -28,8 +28,6 @@ else ()
             utils.c
             include/ttf.c
             page_counter.c
-            ttf_reader.c
-            ttf_reader.h
     )
 
     add_executable(pagecounter main.c)
