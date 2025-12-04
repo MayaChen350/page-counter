@@ -20,7 +20,7 @@ static size_pt getSizeByCharSize(const size_em width, const size_pt font_size, c
 static size_em getLineHeight(const size_em font_ascent,
                              const size_em font_descent,
                              const size_em line_gap) {
-    return (font_ascent + abs(font_descent) + line_gap);
+    return (font_ascent + fabsf(font_descent) + line_gap);
 }
 
 inline static size_pt getHeightExtra(const size_pt extra_height,
@@ -66,8 +66,6 @@ int getPageCount(
     const size_pt max_page_content_width = inchToPt(page_width - (margin_left + margin_right));
     const size_pt paragraph_spacing = inchToPt(paragraph_spacing_before + paragraph_spacing_after);
 
-    // TODO: There is a relation between the line spacing and the font size for the paragraph spacings
-
     ttf_t *const font_file = ttfCreate(ttf_filename, 0, throw_err, NULL);
     const float upm = ttfGetUPM(font_file);
 
@@ -77,7 +75,7 @@ int getPageCount(
             ttfGetDescent(font_file),
             getHHEALineGap(ttf_filename)), font_size, upm);
 
-    const size_pt line_gap = user_line_spacing * line_height;
+    const size_pt line_gap = (user_line_spacing - 1) * line_height;
 
     const size_pt max_page_content_height = getMaxPageContentHeight(
         inchToPt(page_height),
@@ -90,6 +88,7 @@ int getPageCount(
     );
 
 #ifndef NDEBUG
+    printf("Paragraph spacing: %f\n", paragraph_spacing);
     printf("Max page content height: %f\n", max_page_content_height);
     printf("Max page content width: %f\n", max_page_content_width);
     printf("Line height: %f\n", line_height);
@@ -98,7 +97,7 @@ int getPageCount(
     FILE *const file = fopen(filename, "r");
 
     int pageCount = 0;
-    size_pt curr_page_height = line_height; // start with line 1
+    size_pt curr_page_height = line_height * user_line_spacing; // start with line 1
     size_pt line_curr_width = 0;
     size_pt curr_word_width = 0;
     char last_char;
@@ -125,21 +124,21 @@ int getPageCount(
         if (last_char == ' ' || last_char == '\r' || last_char == '\t')
             curr_word_width = 0;
         else
-            curr_word_width = curr_word_width + char_width;
+            curr_word_width += char_width;
 
         // wrap line if needed
         line_curr_width += char_width;
-        if (line_curr_width > max_page_content_width /*UNSURE*/) {
+        if (line_curr_width >= max_page_content_width /*UNSURE*/) {
             line_curr_width = curr_word_width;
         Increase_line:
             if (was_newline)
-                curr_page_height += paragraph_spacing;
+                curr_page_height += paragraph_spacing * user_line_spacing;
             else
-                curr_page_height += line_gap + line_height; // add that the content now takes a new line
+                curr_page_height += user_line_spacing * line_height; // add that the content now takes a new line
 
             if (curr_page_height >= max_page_content_height) {
                 pageCount++;
-                curr_page_height = line_height; // first line, new page
+                curr_page_height = line_height * user_line_spacing; // first line, new page
                 continue; // if a new paragraph start on a new line, I guess there is no extra space needed??
             }
 
@@ -159,7 +158,7 @@ int getPageCount(
     return pageCount;
 }
 
-#define HHEA_LINE_GAP_BYTES_OFFSET 8
+#define HHEA_LINE_GAP_BYTES_OFFSET 7
 #define FWORD_SIZE_BYTES (16 / 8)
 
 signed short getHHEALineGap(const char *ttf_filename) {

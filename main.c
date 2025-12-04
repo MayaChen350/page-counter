@@ -15,11 +15,11 @@ int main(void) {
 
     // TESTS FOR NOW???
 
-    const char *file_names[2] = {"test.txt", "test2.txt"};
-    const int expected[2] = {13, 3};
+    const char *file_names[3] = {"test.txt", "test2.txt", "test3.txt"};
+    const int expected[3] = {22, 4, 7};
     int return_code = 0;
 
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < 3; i++) {
         const int page_counter = getPageCount(
             "arial.ttf",
             11,
@@ -33,10 +33,10 @@ int main(void) {
             0.15f,
             0.5f,
             0.5f,
-            1.15f,
+            2.0f,
             file_names[i]
         );
-        printf("Result: %i\n", page_counter);
+        printf("Result: %i\n\n", page_counter);
         if (page_counter != expected[i]) {
             fprintf(stderr, "\nExpected %i, Actual: %i\n\n", expected[i], page_counter);
             return_code = 1;
@@ -47,7 +47,6 @@ int main(void) {
     // stop_thread = true;
     // pthread_join(console_ui_thread, NULL);
 
-    // should be 3
     return return_code;
 }
 
