@@ -565,10 +565,10 @@ ttfDelete(ttf_t *font) // I - Font
 // 'ttfGetAscent()' - Get the maximum height of non-accented characters.
 //
 
-int // O - Ascent in 1000ths
+float // O - Ascent in 1000ths
 ttfGetAscent(ttf_t *font) // I - Font
 {
-    return (font ? (int) (1000 * font->ascent / font->units) : 0);
+    return (font ? (float) (font->ascent) : 0);
 }
 
 
@@ -648,10 +648,14 @@ ttfGetCopyright(ttf_t *font) // I - Font
 // 'ttfGetDescent()' - Get the maximum depth of non-accented characters.
 //
 
-int // O - Descent in 1000ths
+float // O - Descent in 1000ths
 ttfGetDescent(ttf_t *font) // I - Font
 {
-    return (font ? (int) (1000 * font->descent / font->units) : 0);
+    return (font ? (font->descent) : 0);
+}
+
+float ttfGetUPM(ttf_t *font) {
+    return (font ? font->units : 0);
 }
 
 
@@ -857,7 +861,7 @@ ttfGetWeight(ttf_t *font) // I - Font
 // 'ttfGetWidth()' - Get the width of a single character.
 //
 
-int // O - Width in 1000ths
+float // O - Width in 1000ths
 ttfGetWidth(ttf_t *font, // I - Font
             int ch) // I - Unicode character
 {
@@ -869,9 +873,9 @@ ttfGetWidth(ttf_t *font, // I - Font
         return (0);
 
     if (font->widths[bin])
-        return ((int) (1000.0f * font->widths[bin][ch & 255].width / font->units));
+        return ((font->widths[bin][ch & 255].width));
     else if (font->widths[0]) // .notdef
-        return ((int) (1000.0f * font->widths[0][0].width / font->units));
+        return ((font->widths[0][0].width));
     else
         return (0);
 }

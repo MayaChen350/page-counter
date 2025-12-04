@@ -13,14 +13,14 @@
 
 signed short getHHEALineGap(const char *ttf_filename);
 
-static size_pt getSizeByCharSize(const size_mil width, const size_pt font_size) {
-    return milToInch(width) * font_size;
+static size_pt getSizeByCharSize(const size_em width, const size_pt font_size, const float unit_per_em) {
+    return (width / unit_per_em) * font_size;
 }
 
-static size_mil getLineHeight(const size_mil font_ascent,
-                              const size_mil font_descent,
-                              const size_em line_gap) {
-    return (font_ascent + abs(font_descent) /*+ line_gap*/);
+static size_em getLineHeight(const size_em font_ascent,
+                             const size_em font_descent,
+                             const size_em line_gap) {
+    return (font_ascent + abs(font_descent) + line_gap);
 }
 
 inline static size_pt getHeightExtra(const size_pt extra_height,
@@ -69,12 +69,13 @@ int getPageCount(
     // TODO: There is a relation between the line spacing and the font size for the paragraph spacings
 
     ttf_t *const font_file = ttfCreate(ttf_filename, 0, throw_err, NULL);
+    const float upm = ttfGetUPM(font_file);
 
     const size_pt line_height = getSizeByCharSize(
         getLineHeight(
             ttfGetAscent(font_file),
             ttfGetDescent(font_file),
-            getHHEALineGap(ttf_filename)), font_size);
+            getHHEALineGap(ttf_filename)), font_size, upm);
 
     const size_pt line_gap = user_line_spacing * line_height;
 
@@ -105,7 +106,7 @@ int getPageCount(
         bool was_newline = false;
 #ifdef _WIN64
         if (last_char == '\r') {
-            // pass the `\n` character to do the same thing
+            // skip the `\n` character to do the same thing
             fgetc(file); // now `\n`
 #else
         if (last_char == '\n') {
@@ -116,7 +117,7 @@ int getPageCount(
             goto Increase_line;
         }
 
-        const size_pt char_width = getSizeByCharSize(ttfGetWidth(font_file, last_char), font_size);
+        const size_pt char_width = getSizeByCharSize(ttfGetWidth(font_file, last_char), font_size, upm);
         // #ifndef NDEBUG
         //         if (last_char == ' ')
         //             printf("Char width of %c: %f\n", last_char, char_width);
@@ -128,7 +129,7 @@ int getPageCount(
 
         // wrap line if needed
         line_curr_width += char_width;
-        if (line_curr_width >= max_page_content_width /*UNSURE*/) {
+        if (line_curr_width > max_page_content_width /*UNSURE*/) {
             line_curr_width = curr_word_width;
         Increase_line:
             if (was_newline)
@@ -172,26 +173,9 @@ signed short getHHEALineGap(const char *ttf_filename) {
         if (last_char == EOF) {
             THROW("The file structure was incorrect");
         }
+        const char tag[4] = "hhea";
 
-        if (state == 0 && last_char == 'h')
-            state++;
-        else if (state == 1)
-            if (last_char == 'h')
-                state++;
-            else
-                state = 0;
-        else if (state == 2)
-            if (last_char == 'e')
-                state++;
-            else
-                state = 0;
-        else if (state == 3)
-            if (last_char == 'a')
-                state++;
-            else
-                state = 0;
-        else {
-        }
+        state = last_char == tag[state] ? state + 1 : 0;
     }
 
     fread(&state, HHEA_LINE_GAP_BYTES_OFFSET, 1, fp); // why not reusing state to discard data
