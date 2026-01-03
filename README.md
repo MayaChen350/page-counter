@@ -13,4 +13,4 @@ You can also run the `distribute` shell script at the root of the project if you
 The page counter also comes as a library, in fact, when compiling a library is also created individually from the
 executable.
 
-If not yet available in the RELEASES, if your OS support `sh`, you can run ```./distribute ```
+If not yet available in the RELEASES, if your OS support `sh`, you can run ```./distribute lib```
