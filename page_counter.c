@@ -103,6 +103,8 @@ int getPageCount(
     size_pt curr_word_width = 0;
     char last_char;
     while ((last_char = (char) fgetc(file)) != EOF) {
+        printf("Last char: %c\n", last_char);
+
         size_pt alt_curr_page_height = curr_page_height;
         bool first_and_last_para = false;
         bool was_newline = false;
@@ -113,6 +115,7 @@ int getPageCount(
 #else
             if (last_char == '\n') {
 #endif
+            printf("New line!\n");
             para_line_count = 1;
             curr_word_width = 0;
             line_curr_width = 0;
@@ -136,12 +139,14 @@ int getPageCount(
         if (line_curr_width >= max_page_content_width /*UNSURE*/) {
             line_curr_width = curr_word_width;
             para_line_count++;
+            printf("New paragraph line: Line count: %i\n", para_line_count);
         Increase_line:
              if (was_newline) {
                 curr_page_height += paragraph_spacing * user_line_spacing;
              } 
 
              if (first_and_last_para && para_line_count == 4) {
+                 printf("The line count of the first paragraph was above 4 and it got trimmed to 2.\n");
                  curr_page_height = 2 * (user_line_spacing * line_height);
                  continue;
              }
@@ -150,15 +155,17 @@ int getPageCount(
             // the line spacing and paragraph_spacing of the last line of a page doesn't count
             alt_curr_page_height += line_height;
             if (alt_curr_page_height >= max_page_content_height) {
+                printf("New page!\n");
                 pageCount++;
                 if (was_newline) {
                     curr_page_height = line_height * user_line_spacing; // first line, new page
                     was_newline = false; // if a new paragraph start on a new line, I guess there is no extra space needed??
                 } else {
                     first_and_last_para = true;
-                    if (para_line_count > 3)
+                    if (para_line_count > 3) {
+                        printf("The lines of the last paragraph was added to the new page.\n");
                         curr_page_height = 2 * (line_height * user_line_spacing);
-                    else
+                    } else
                         curr_page_height = para_line_count * (line_height * user_line_spacing);
                 }
             }
