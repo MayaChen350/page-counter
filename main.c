@@ -16,12 +16,12 @@ int main(void) {
     // TESTS FOR NOW???
 
     const char *file_names[3] = {"test.txt", "test2.txt", "test3.txt"};
-    const int expected[3] = {22, 4, 7};
+    const int expected[3] = {11, 1, 12};
     int return_code = 0;
 
     for (int i = 0; i < 3; i++) {
         const int page_counter = getPageCount(
-            "arial.ttf",
+            "Jersey10Charted-Regular.ttf",
             11,
             8.5f,
             1,

@@ -13,8 +13,8 @@
 
 signed short getHHEALineGap(const char *ttf_filename);
 
-static size_pt getSizeByCharSize(const size_em width, const size_pt font_size, const float unit_per_em) {
-    return (width / unit_per_em) * font_size;
+static size_pt getSizeByCharSize(const float width, const size_pt font_size, const float unit_per_em) {
+    return (width * font_size) / unit_per_em;
 }
 
 static size_em getLineHeight(const size_em font_ascent,
@@ -69,8 +69,7 @@ int getPageCount(
     ttf_t *const font_file = ttfCreate(ttf_filename, 0, throw_err, NULL);
     const float upm = ttfGetUPM(font_file);
 
-    const size_pt line_height = getSizeByCharSize(
-        getLineHeight(
+    const size_pt line_height = getSizeByCharSize(getLineHeight(
             ttfGetAscent(font_file),
             ttfGetDescent(font_file),
             getHHEALineGap(ttf_filename)), font_size, upm);
@@ -88,6 +87,7 @@ int getPageCount(
     );
 
 #ifndef NDEBUG
+    printf("Unit per em %f\n", upm);
     printf("Paragraph spacing: %f\n", paragraph_spacing);
     printf("Max page content height: %f\n", max_page_content_height);
     printf("Max page content width: %f\n", max_page_content_width);
@@ -96,23 +96,28 @@ int getPageCount(
 
     FILE *const file = fopen(filename, "r");
 
-    int pageCount = 0;
+    int pageCount = 1;
+    int para_line_count = 1;
     size_pt curr_page_height = line_height * user_line_spacing; // start with line 1
     size_pt line_curr_width = 0;
     size_pt curr_word_width = 0;
     char last_char;
     while ((last_char = (char) fgetc(file)) != EOF) {
+        size_pt alt_curr_page_height = curr_page_height;
+        bool first_and_last_para = false;
         bool was_newline = false;
 #ifdef _WIN64
         if (last_char == '\r') {
             // skip the `\n` character to do the same thing
             fgetc(file); // now `\n`
 #else
-        if (last_char == '\n') {
+            if (last_char == '\n') {
 #endif
+            para_line_count = 1;
             curr_word_width = 0;
             line_curr_width = 0;
             was_newline = true;
+            first_and_last_para = false;
             goto Increase_line;
         }
 
@@ -130,22 +135,35 @@ int getPageCount(
         line_curr_width += char_width;
         if (line_curr_width >= max_page_content_width /*UNSURE*/) {
             line_curr_width = curr_word_width;
+            para_line_count++;
         Increase_line:
-            if (was_newline)
+             if (was_newline) {
                 curr_page_height += paragraph_spacing * user_line_spacing;
-            else
-                curr_page_height += user_line_spacing * line_height; // add that the content now takes a new line
+             } 
 
-            if (curr_page_height >= max_page_content_height) {
+             if (first_and_last_para && para_line_count == 4) {
+                 curr_page_height = 2 * (user_line_spacing * line_height);
+                 continue;
+             }
+             else curr_page_height += user_line_spacing * line_height; // add that the content now takes a new line
+
+            // the line spacing and paragraph_spacing of the last line of a page doesn't count
+            alt_curr_page_height += line_height;
+            if (alt_curr_page_height >= max_page_content_height) {
                 pageCount++;
-                curr_page_height = line_height * user_line_spacing; // first line, new page
-                continue; // if a new paragraph start on a new line, I guess there is no extra space needed??
+                if (was_newline) {
+                    curr_page_height = line_height * user_line_spacing; // first line, new page
+                    was_newline = false; // if a new paragraph start on a new line, I guess there is no extra space needed??
+                } else {
+                    first_and_last_para = true;
+                    if (para_line_count > 3)
+                        curr_page_height = 2 * (line_height * user_line_spacing);
+                    else
+                        curr_page_height = para_line_count * (line_height * user_line_spacing);
+                }
             }
 
-            if (was_newline) {
-                was_newline = false;
-                goto Increase_line;
-            }
+            was_newline = false;
         }
     }
 #ifndef NDEBUG
