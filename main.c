@@ -1,3 +1,4 @@
+#include <locale.h>
 #include <stdio.h>
 #include <pthread.h>
 #include <stdbool.h>
@@ -10,6 +11,7 @@
 void *console_loading();
 
 int main(void) {
+    setlocale(LC_ALL, "");
     // pthread_t console_ui_thread;
     // pthread_create(&console_ui_thread, NULL, console_loading, NULL);
 
