@@ -13,9 +13,9 @@ void throw_err(void *_, const char *msg);
     fprintf(stderr, "ERROR: %sn", msg); \
     exit(1);
 
-typedef float size_pt;
-typedef float size_em;
-typedef float size_in;
+typedef double size_pt;
+typedef double size_em;
+typedef double size_in;
 
 size_pt inchToPt(size_in size);
 

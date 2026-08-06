@@ -25,7 +25,7 @@ int getPageCount(
     size_in header_from_top,
     size_in footer_from_bottom,
 
-    float user_line_spacing,
+    double user_line_spacing,
     const char *filename
 );
 

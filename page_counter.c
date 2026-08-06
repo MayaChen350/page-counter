@@ -14,28 +14,32 @@
 
 signed short getHHEALineGap(const char *ttf_filename);
 
-static size_pt getSizeByCharSize(const float width, const size_pt font_size, const float unit_per_em) {
+static size_pt unitToPt(const double width, const size_pt font_size, const double unit_per_em) {
     return (width * font_size) / unit_per_em;
 }
 
-//static size_em getLineHeight(const size_em font_ascent,
-//                             const size_em font_descent,
-//                            const size_em line_gap) {
-//    return (font_ascent + fabsf(font_descent) + line_gap);
-//}
-
-static size_pt getLineHeight(const size_pt font_size,
-                             const float line_spacing) {
-    return font_size * line_spacing;
+static size_em getLineHeight(const size_pt font_size,
+                             const size_em font_ascent,
+                             const size_em font_descent,
+                             const size_pt line_gap,
+                             const double unit_per_em,
+                             const double line_spacing) {
+    const double factor = ((font_ascent + fabs(font_descent) + line_gap) / unit_per_em);
+    return font_size * factor * line_spacing;
 }
 
+//static size_pt getLineHeight(const size_pt font_size,
+//                             const double line_spacing) {
+//    return font_size` * 1.2 * line_spacing;
+//}
+
 static size_pt getHeightExtra(const size_pt extra_height, // text margin from top/bottom
-                                     const size_pt margin,
+                                     const size_pt page_margin,
                                      const size_pt line_height) {
-    if (extra_height <= margin)
-        return margin;
+    if (extra_height <= page_margin)
+        return page_margin;
     else if (line_height >= extra_height)
-        return margin + extra_height + (line_height > extra_height ? line_height : 0);
+        return page_margin + extra_height + (line_height > extra_height ? line_height : 0);
     else
         return line_height + extra_height;
 }
@@ -66,16 +70,21 @@ int getPageCount(
     const size_in paragraph_spacing_after,
     const size_in header_from_top,
     const size_in footer_from_bottom,
-    const float user_line_spacing,
+    const double user_line_spacing,
     const char *filename
 ) {
     const size_pt max_page_content_width = inchToPt(page_width - (margin_left + margin_right));
     const size_pt paragraph_spacing = inchToPt(paragraph_spacing_before + paragraph_spacing_after);
 
     ttf_t *const font_file = ttfCreate(ttf_filename, 0, throw_err, NULL);
-    const float upm = ttfGetUPM(font_file);
+    const double upm = ttfGetUPM(font_file);
 
-    const size_pt line_height = getLineHeight(font_size, user_line_spacing);
+    const size_pt line_height = getLineHeight(font_size,
+        ttfGetAscent(font_file), 
+        ttfGetDescent(font_file),
+        getHHEALineGap(ttf_filename),
+        upm,
+        user_line_spacing);
 
     const size_pt line_gap = (user_line_spacing - 1) * line_height; // i have no idea what is that anymore but this is probably wrong
 
@@ -116,7 +125,7 @@ int getPageCount(
 #else
             if (last_char == '\n') {
 #endif
-            printf("New line! Current page height: %f/%f\n", curr_page_height, max_page_content_height);
+            printf("New line!");
             para_line_count = 1;
             curr_word_width = 0;
             line_curr_width = 0;
@@ -125,7 +134,7 @@ int getPageCount(
             goto Increase_line;
         }
 
-        const size_pt char_width = getSizeByCharSize(ttfGetWidth(font_file, last_char), font_size, upm);
+        const size_pt char_width = unitToPt(ttfGetWidth(font_file, last_char), font_size, upm);
         // #ifndef NDEBUG
         //         if (last_char == ' ')
         //             printf("Char width of %c: %f\n", last_char, char_width);
@@ -152,19 +161,19 @@ int getPageCount(
                  continue;
              }
              else curr_page_height +=  line_height; // add that the content now takes a new line
+            printf(" Current page height: %f/%f\n", curr_page_height, max_page_content_height);
 
-            // the line spacing and paragraph_spacing of the last line of a page doesn't count
-            alt_curr_page_height += line_height;
-            if (alt_curr_page_height >= max_page_content_height) {
-                printf("New page! Alt Page Height: %f\n", alt_curr_page_height);
+            // the line spacing of the last line of a page doesn't count
+            alt_curr_page_height += font_size;
+            if (curr_page_height >= max_page_content_height) {
+                printf("New page! Page Height was: %f\n", curr_page_height);
                 pageCount++;
                 if (was_newline) {
                     curr_page_height = line_height; // first line, new page
-                    was_newline = false; // if a new paragraph start on a new line, I guess there is no extra space needed??
                 } else {
                     first_and_last_para = true;
                     if (para_line_count > 3) {
-                        printf("The lines of the last paragraph was added to the new page.\n");
+                       printf("The lines of the last paragraph was added to the new page.\n");
                         curr_page_height = 2 * (line_height);
                     } else
                         curr_page_height = para_line_count * (line_height);
@@ -175,7 +184,7 @@ int getPageCount(
         }
     }
 #ifndef NDEBUG
-    printf("Last page content height: %f\n", curr_page_height);
+ //   printf("Last page content height: %f\n", curr_page_height);
 #endif
 
     fclose(file);

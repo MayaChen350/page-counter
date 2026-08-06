@@ -17,25 +17,25 @@ int main(void) {
 
     // TESTS FOR NOW???
 
-    const char *file_names[3] = {"test.txt", "test2.txt", "test3.txt"};
-    const int expected[3] = {11, 1, 12};
+    const char *file_names[3] = {"test3.txt", "test2.txt", "test.txt"};
+    const int expected[3] = {12, 1, 11};
     int return_code = 0;
 
     for (int i = 0; i < 3; i++) {
         const int page_counter = getPageCount(
             "Jersey10Charted-Regular.ttf",
             11,
-            8.5f,
+            8.5,
             1,
             1,
             1,
             1,
             11,
-            0.0f,
-            0.15f,
-            0.5f,
-            0.5f,
-            2.0f,
+            0.0,
+            0.15,
+            0.5,
+            0.5,
+            2.0,
             file_names[i]
         );
         printf("Result: %i\n\n", page_counter);
