@@ -9,9 +9,9 @@
 
 void throw_err(void *_, const char *msg);
 
-#define THROW(msg) \
-    fprintf(stderr, "ERROR: %sn", msg); \
-    exit(1);
+#define THROW(msg)                                                             \
+  fprintf(stderr, "ERROR: %sn", msg);                                          \
+  exit(1);
 
 typedef double size_pt;
 typedef double size_em;
@@ -25,4 +25,4 @@ size_in milToInch(size_mil size);
 
 bool strEqual(const char *s1, const char *s2);
 
-#endif //PAGE_COUNTER_UTILS_H
+#endif // PAGE_COUNTER_UTILS_H
