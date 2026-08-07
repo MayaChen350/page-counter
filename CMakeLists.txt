@@ -6,7 +6,8 @@ option(BUILD_WASM "Build the library for WebAssembly" OFF)
 set(CMAKE_C_STANDARD 99)
 
 set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type")
-set(CMAKE_C_FLAGS_RELEASE "-O3 -DNDEBUG -ffunction-sections -fdata-sections")
+set(CMAKE_C_FLAGS_DEBUG "-DDEBUG -ffunction-sections -fdata-sections")
+set(CMAKE_C_FLAGS_RELEASE "-O3 -ffunction-sections -fdata-sections")
 
 if (BUILD_WASM)
     message(STATUS "Building for WebAssembly")
