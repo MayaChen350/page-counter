@@ -62,15 +62,13 @@ static size_pt getMaxPageContentHeight(const size_pt page_height,
   return page_height - height_header - height_footer;
 }
 
-int getPageCount(const char *ttf_filename, const size_in page_height,
-                 const size_in page_width, const size_in margin_top,
-                 const size_in margin_bottom, const size_in margin_left,
-                 const size_in margin_right, const size_pt font_size,
-                 const size_in paragraph_spacing_before,
-                 const size_in paragraph_spacing_after,
-                 const size_in header_from_top,
-                 const size_in footer_from_bottom,
-                 const double user_line_spacing, const char *filename) {
+int page_count(const char *filename, const char *ttf_filename,
+                 size_pt font_size, double user_line_spacing,
+                 size_in page_height, size_in page_width, size_in margin_top,
+                 size_in margin_bottom, size_in margin_left,
+                 size_in margin_right, size_in paragraph_spacing_before,
+                 size_in paragraph_spacing_after, size_in header_from_top,
+                 size_in footer_from_bottom) {
   const size_pt max_page_content_width =
       inchToPt(page_width - (margin_left + margin_right));
   const size_pt paragraph_spacing =
@@ -99,7 +97,7 @@ int getPageCount(const char *ttf_filename, const size_in page_height,
   printf("Line height: %f\n", line_height);
 #endif
 
-  FILE *const file = fopen(filename, "r");
+  FILE *const file = filename == NULL ? stdin : fopen(filename, "r");
 
   int pageCount = 1;
   int para_line_count = 1;

@@ -115,10 +115,12 @@ int main(int argc, char **argv) {
       }
     }
 
-  int result = getPageCount(argv[2], page_height, page_width, margin_top,
-                            margin_bottom, margin_left, margin_right, font_size,
-                            para_spacing_bef, para_spacing_aft, header_from_top,
-                            header_from_bottom, line_spacing, argv[1]);
+  char *filename = strcmp(argv[1], "--stdin") == 0 ? NULL : argv[1];
+
+  int result = page_count(
+      filename, argv[2], font_size, line_spacing, page_height, page_width,
+      margin_top, margin_bottom, margin_left, margin_right, para_spacing_bef,
+      para_spacing_aft, header_from_top, header_from_bottom);
 
   // stop_thread = true;
   // pthread_join(console_ui_thread, NULL);
