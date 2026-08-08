@@ -17,7 +17,7 @@ typedef double size_pt;
 typedef double size_em;
 typedef double size_in;
 
-size_pt inchToPt(size_in size);
+size_pt inchToPt(const size_in size);
 
 size_in milToInch(size_mil size);
 

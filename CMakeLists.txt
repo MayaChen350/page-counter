@@ -33,5 +33,5 @@ else ()
 
     add_executable(pagecounter main.c)
 
-    target_link_libraries(pagecounter PRIVATE pagecounter_lib m)
+    target_link_libraries(pagecounter PRIVATE pagecounter_lib)
 endif ()

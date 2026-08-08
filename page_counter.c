@@ -119,9 +119,9 @@ int getPageCount(const char *ttf_filename, const size_in page_height,
     if (last_char == '\r') {
       // skip the `\n` character to do the same thing
       fgetc(file); // now `\n`
-#else
-    if (last_char == '\n') {
+    }
 #endif
+    if (last_char == '\n') {
 #ifdef DEBUG
       printf("New line!");
 #endif
@@ -208,19 +208,19 @@ int getPageCount(const char *ttf_filename, const size_in page_height,
 #define FWORD_SIZE_BYTES (16 / 8)
 
 signed short getHHEALineGap(const char *ttf_filename) {
-  FILE *fp = fopen(ttf_filename, "r");
+  FILE *fp = fopen(ttf_filename, "rb");
   signed short result;
 
   int state = 0; // MUST stop before 4
   while (state < 4) {
-    const char last_char = (char)fgetc(fp);
+    const int last_char = fgetc(fp);
 
     if (last_char == EOF) {
       THROW("The file structure was incorrect");
     }
     const char tag[4] = "hhea";
 
-    state = last_char == tag[state] ? state + 1 : 0;
+    state = (char)last_char == tag[state] ? state + 1 : 0;
   }
 
   fread(&state, HHEA_LINE_GAP_BYTES_OFFSET, 1,
